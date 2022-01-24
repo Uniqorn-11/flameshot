@@ -36,7 +36,17 @@
 
 namespace color_widgets {
 
-class Swatch::Private
+// pos is deprecated in Qt6
+template <typename T>
+QPointF pos_wrap(T* event)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return event->position();
+#else
+    return event->pos();
+#endif
+}
+    class Swatch::Private
 {
 public:
     ColorPalette palette;    ///< Palette with colors and related metadata
@@ -122,7 +132,7 @@ public:
     void dropEvent(QDropEvent* event)
     {
         // Find the output location
-        drop_index = indexAt(event->pos());
+        drop_index = indexAt(pos_wrap(event).toPoint());
         if ( drop_index == -1 )
             drop_index = palette.count();
 
@@ -145,20 +155,20 @@ public:
             if ( palette.columns() == 1 || forced_columns == 1 )
             {
                 // Dragged to the last quarter of the size of the square, add after
-                if ( event->posF().y() >= drop_rect.top() + drop_rect.height() * 3.0 / 4 )
+                if ( pos_wrap(event).y() >= drop_rect.top() + drop_rect.height() * 3.0 / 4 )
                     drop_index++;
                 // Dragged to the middle of the square, overwrite existing color
-                else if ( event->posF().x() > drop_rect.top() + drop_rect.height() / 4 &&
+                else if ( pos_wrap(event).x() > drop_rect.top() + drop_rect.height() / 4 &&
                         ( event->dropAction() != Qt::MoveAction || event->source() != owner ) )
                     drop_overwrite = true;
             }
             else
             {
                 // Dragged to the last quarter of the size of the square, add after
-                if ( event->posF().x() >= drop_rect.left() + drop_rect.width() * 3.0 / 4 )
+                if ( pos_wrap(event).x() >= drop_rect.left() + drop_rect.width() * 3.0 / 4 )
                     drop_index++;
                 // Dragged to the middle of the square, overwrite existing color
-                else if ( event->posF().x() > drop_rect.left() + drop_rect.width() / 4 &&
+                else if ( pos_wrap(event).x() > drop_rect.left() + drop_rect.width() / 4 &&
                         ( event->dropAction() != Qt::MoveAction || event->source() != owner ) )
                     drop_overwrite = true;
             }

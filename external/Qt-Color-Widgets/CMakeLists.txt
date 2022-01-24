@@ -42,9 +42,11 @@ SET (${COLORWIDGET_PROJECT_NAME}_VERSION "${${COLORWIDGET_PROJECT_NAME}_VERSION_
 
 
 
+if(NOT QT_VERSION_MAJOR)
+  set(QT_VERSION_MAJOR 5 CACHE STRING "Qt version to use (4, 5 or 6), defaults to 5")
+endif()
 
-set(QT_VERSION_MAJOR 6)
-find_package(QT NAMES Qt5 Qt6 Qt4 COMPONENTS Core QUIET)
+find_package(QT NAMES Qt${QT_VERSION_MAJOR} COMPONENTS Core QUIET)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Widgets REQUIRED)
 
 
@@ -159,10 +161,10 @@ add_subdirectory (gallery)
 
 option(QTCOLORWIDGETS_DESIGNER_PLUGIN "Build QtDesigner plugin" ON)
 if (${QTCOLORWIDGETS_DESIGNER_PLUGIN})
-    find_package (Qt5Designer QUIET)
-    if (Qt5Designer_FOUND)
+  find_package (Qt${QT_VERSION_MAJOR}Designer QUIET)
+  if (Qt${QT_VERSION_MAJOR}Designer_FOUND)
         add_subdirectory (color_widgets_designer_plugin)
-    endif(Qt5Designer_FOUND)
+      endif(Qt${QT_VERSION_MAJOR}Designer_FOUND)
 endif()
 
 configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
@@ -172,3 +174,4 @@ add_custom_target(
     COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/gallery/*.png ${CMAKE_CURRENT_BINARY_DIR}/doxygen/html
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
+
