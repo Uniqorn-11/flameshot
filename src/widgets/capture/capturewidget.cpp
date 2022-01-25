@@ -1063,10 +1063,10 @@ void CaptureWidget::initSelection()
             OverlayMessage::push(m_helpMessage);
         }
     });
-    //if (!initialSelection.isNull()) {
-    //    initialSelection.moveTopLeft(initialSelection.topLeft() -
-    //                                 mapToGlobal({}));
-    //}
+    if (!initialSelection.isNull()) {
+        initialSelection.moveTopLeft(initialSelection.topLeft() -
+                                     mapToGlobal(QPoint{}));
+    }
     m_selection->setGeometry(initialSelection);
     m_selection->setVisible(!initialSelection.isNull());
     if (!initialSelection.isNull()) {

@@ -5,6 +5,7 @@
 #include "src/utils/globalvalues.h"
 #include "src/utils/history.h"
 #include "src/widgets/notificationwidget.h"
+#include "src/core/qguiappcurrentscreen.h"
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QFileInfo>
@@ -16,6 +17,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QUrl>
+#include <QScreen>
 #include <QVBoxLayout>
 
 HistoryWidget::HistoryWidget(QWidget* parent)
@@ -24,7 +26,7 @@ HistoryWidget::HistoryWidget(QWidget* parent)
     setWindowIcon(QIcon(GlobalValues::iconPath()));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowTitle(tr("Latest Uploads"));
-    //resize(QDesktopWidget().availableGeometry(this).size() * 0.5);
+    resize(QGuiAppCurrentScreen().currentScreen()->availableGeometry().size() * 0.5);
     m_notification = new NotificationWidget();
 
     QGridLayout* layout = new QGridLayout(this);

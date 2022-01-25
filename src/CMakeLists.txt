@@ -1,18 +1,24 @@
-
-set(QT_DEFAULT_MAJOR_VERSION 6)
-set(QT_VERSION_MAJOR 6)
 find_package(
-        Qt6
+    Qt${QT_VERSION_MAJOR}
         CONFIG
         REQUIRED
         Core
-        Core5Compat
         Gui
         Widgets
         Network
         Svg
         DBus
         LinguistTools)
+
+if (USE_QT6)
+  find_package(
+      Qt6
+          CONFIG
+          REQUIRED
+          Core5Compat
+          )
+endif()
+
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -112,17 +118,22 @@ set(FLAMESHOT_TS_FILES
         ${CMAKE_SOURCE_DIR}/data/translations/Internationalization_zh_TW.ts)
 
 if (GENERATE_TS)
-    qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${FLAMESHOT_TS_FILES})
+  if(USE_QT6)
+      qt6_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${FLAMESHOT_TS_FILES})
+  else()
+      qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${FLAMESHOT_TS_FILES})
+  endif()
 else ()
+  if(USE_QT6)
     qt6_add_translation(QM_FILES ${FLAMESHOT_TS_FILES})
+  else()
+    qt5_add_translation(QM_FILES ${FLAMESHOT_TS_FILES})
+  endif()
 endif ()
 
 target_sources(
         flameshot
         PRIVATE
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../external/Qt-Color-Widgets/src/QtColorWidgets/color_utils.cpp
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../external/Qt-Color-Widgets/src/QtColorWidgets/color_wheel.cpp
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../external/Qt-Color-Widgets/include/QtColorWidgets/color_wheel.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../data/graphics.qrc
         ${CMAKE_CURRENT_SOURCE_DIR}/../data/flameshot.rc # windows binary icon resource file
         ${QM_FILES}
@@ -176,18 +187,25 @@ else ()
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../external/singleapplication>)
 endif()
 
+
 target_link_libraries(
         flameshot
         project_warnings
         project_options
-        Qt6::Svg
-        Qt6::DBus
-        Qt6::Network
-        Qt6::Widgets
-        Qt6::Core5Compat
+        Qt${QT_VERSION_MAJOR}::Svg
+        Qt${QT_VERSION_MAJOR}::DBus
+        Qt${QT_VERSION_MAJOR}::Network
+        Qt${QT_VERSION_MAJOR}::Widgets
         ${QTSINGLEAPPLICATION_LIBRARY}
         QtColorWidgets
 )
+
+if (USE_QT6)
+  target_link_libraries(
+          flameshot
+          Qt6::Core5Compat
+  )
+endif()
 
 if (APPLE)
     set(MACOSX_BUNDLE_IDENTIFIER "org.flameshot")

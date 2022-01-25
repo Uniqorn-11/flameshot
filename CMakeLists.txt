@@ -1,17 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
-
 set(FLAMESHOT_VERSION 11.0.0)
 
-# Flameshot-org
 set(GIT_API_URL "https://api.github.com/repos/flameshot-org/flameshot/releases/latest")
 project(
         flameshot
         VERSION ${FLAMESHOT_VERSION}
         LANGUAGES CXX)
 set(PROJECT_NAME_CAPITALIZED "Flameshot")
-
-set(QT_DEFAULT_MAJOR_VERSION 6)
-set(QT_VERSION_MAJOR 6)
 
 # This can be read from ${PROJECT_NAME} after project() is called
 if (APPLE)
@@ -39,11 +34,23 @@ set(RUN_IN_PLACE
         CACHE BOOL "Run directly in source directory structure")
 
 
+
+option(USE_QT6 "Enable building aginst Qt6" ON)
 option(FLAMESHOT_DEBUG_CAPTURE "Enable mode to make debugging easier" OFF)
 option(USE_MONOCHROME_ICON "Build using monochrome icon as default" OFF)
 option(GENERATE_TS "Regenerate translation source files" OFF)
 option(USE_EXTERNAL_SINGLEAPPLICATION "Use external QtSingleApplication library" OFF)
 option(USE_LAUNCHER_ABSOLUTE_PATH "Use absolute path for the desktop launcher" ON)
+
+
+if (USE_QT6)
+  set(QT_DEFAULT_MAJOR_VERSION 6)
+  set(QT_VERSION_MAJOR 6)
+else()
+  set(QT_DEFAULT_MAJOR_VERSION 5)
+  set(QT_VERSION_MAJOR 5)
+endif()
+
 
 include(cmake/StandardProjectSettings.cmake)
 

@@ -21,13 +21,10 @@
 #include <QDir>
 #include <QLibraryInfo>
 #include <QSharedMemory>
-#include <QTimer>
 #include <QTranslator>
 
 #if defined(Q_OS_LINUX) || defined(Q_OS_UNIX)
-#include "abstractlogger.h"
 #include "src/core/flameshotdbusadapter.h"
-#include <QApplication>
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <desktopinfo.h>
@@ -85,9 +82,9 @@ int main(int argc, char* argv[])
     wayland_hacks();
 #endif
 
-    // required for the button serialization
-    // TODO: change to QVector in v1.0
-    //qRegisterMetaTypeStreamOperators<QList<int>>("QList<int>");
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    qRegisterMetaTypeStreamOperators<QList<int>>("QList<int>");
+#endif
     QCoreApplication::setApplicationVersion(APP_VERSION);
     QCoreApplication::setApplicationName(QStringLiteral("flameshot"));
     QCoreApplication::setOrganizationName(QStringLiteral("flameshot"));
@@ -101,7 +98,8 @@ int main(int argc, char* argv[])
 #endif
         QApplication::setStyle(new StyleOverride);
 
-        QTranslator translator, qtTranslator;
+        QTranslator translator;
+        QTranslator qtTranslator;
         QStringList trPaths = PathInfo::translationsPaths();
 
         for (const QString& path : trPaths) {
@@ -124,7 +122,7 @@ int main(int argc, char* argv[])
         qApp->installTranslator(&qtTranslator);
         qApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 
-        auto c = Controller::getInstance();
+        auto *c = Controller::getInstance();
         FlameshotDaemon::start();
 
 #if !(defined(Q_OS_MACOS) || defined(Q_OS_WIN))
@@ -240,7 +238,7 @@ int main(int argc, char* argv[])
     const QString regionErr = QObject::tr(
       "Invalid region, use 'WxH+X+Y' or 'all' or 'screen0/screen1/...'.");
     auto numericChecker = [](const QString& delayValue) -> bool {
-        bool ok;
+        bool ok = false;
         int value = delayValue.toInt(&ok);
         return ok && value >= 0;
     };
